@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moe's Valentine Adventure</title>
+    <style>
+        :root {
+            --primary-pink: #ff69b4;
+            --secondary-pink: #ff99cc;
+            --heart-red: #ff3860;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff99cc 0%, #ff69b4 100%);
+            font-family: 'Comic Neue', cursive;
+            text-align: center;
+            overflow: hidden;
+            margin: 0;
+            height: 100vh;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            padding: 20px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .floating-heart {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+            font-size: 30px;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-100px) rotate(180deg); }
+        }
+
+        /* Homepage Styles */
+        #homeScreen {
+            background: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="%23ff99cc" d="M42.7,-59.2C54.7,-53.6,63.3,-39.6,70.1,-23.7C76.9,-7.8,81.8,9.9,75.5,22.9C69.3,35.8,51.9,44,35.9,53.5C19.9,63,5.3,73.8,-12.8,75.9C-30.9,78,-53.5,71.3,-63.8,58.2C-74.1,45.1,-72.1,25.5,-69.1,8.7C-66.1,-8.1,-62.2,-22.2,-54.8,-34.2C-47.3,-46.1,-36.4,-55.9,-22.6,-60.8C-8.7,-65.7,8.1,-65.7,42.7,-59.2Z" transform="translate(100 100)"/></svg>');
+            background-size: cover;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 50px auto;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+        }
+
+        .memory-card {
+            background: var(--primary-pink);
+            border-radius: 10px;
+            height: 80px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            transition: transform 0.3s;
+        }
+
+        /* Main Screen Styles */
+        #mainScreen h1 {
+            font-family: 'Lobster', cursive;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 3em;
+            margin: 30px 0;
+        }
+
+        .buttons {
+            position: relative;
+            margin: 50px 0;
+            min-height: 100px;
+        }
+
+        .valentine-btn {
+            font-size: 24px;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #yesBtn {
+            background: linear-gradient(45deg, #ff3860, #ff69b4);
+            color: white;
+        }
+
+        #noBtn {
+            background: linear-gradient(45deg, #e440f3, #ff69b4);
+            color: white;
+            position: absolute;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .gif-container {
+            margin: 30px auto;
+            max-width: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .success-message {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            font-size: 1.5em;
+            margin: 20px auto;
+            max-width: 600px;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Screen -->
+    <div id="homeScreen" class="screen active">
+        <div class="game-container">
+            <h2>💖 Prove Your Love  💖</h2>
+            <p>Match the hearts to unlock your Valentine's question :3</p>
+            <div class="memory-grid" id="memoryGrid"></div>
+        </div>
+        <img src="2.gif" alt="anime couple" class="gif">
+    </div>
+
+    <!-- Main Screen -->
+    <div id="mainScreen" class="screen">
+        <h1>Will You Be My Valentine, My Sweet amine? 🌸</h1>
+        
+        <div class="buttons">
+            <button class="valentine-btn" id="yesBtn" onclick="acceptValentine()">YES! FOREVER YOURS </button>
+            <button class="valentine-btn" id="noBtn" onmouseover="moveButton()" onclick="growYes()">NO</button>
+
+        </div>
+      
+
+        <div class="gif-container hidden" id="noGifContainer">
+            <img src="5.gif" alt="cute plea" class="gif">
+        </div>
+
+        <div class="gif-container hidden" id="yesGifContainer">
+            <img src="1.gif" alt="anime couple" class="gif">
+        </div>
+
+        <div id="successMessage" class="hidden success-message">
+            <h3> YAY :3! my Heart skip a beat rn </h3>
+            <p>I knew u gon say yessss</p>
+            <p> i loveee u soo much , m lovely moe soooo muchhh kissessss<3 🌹✨</p>
+            <div class="hearts-animation">💖💖💖</div>
+        </div>
+    </div>
+
+    <script>
+        // Generate floating hearts
+        function createFloatingHearts() {
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = '💖';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                document.body.appendChild(heart);
+            }
+        }
+
+        // Memory Game Logic
+        const cards = ['💖', '💖', '🌸', '🌸', '🎀', '🎀', '💌', '💌'];
+        let openedCards = [];
+        let matchedPairs = 0;
+
+        function createMemoryGame() {
+            const grid = document.getElementById('memoryGrid');
+            cards.sort(() => Math.random() - 0.5);
+            
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.value = emoji;
+                card.dataset.index = index;
+                card.textContent = '❓';
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(e) {
+            const card = e.target;
+            if (card.textContent !== '❓' || openedCards.length === 2) return;
+            
+            card.textContent = card.dataset.value;
+            openedCards.push(card);
+            
+            if (openedCards.length === 2) {
+                setTimeout(checkMatch, 500);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = openedCards;
+            
+            if (card1.dataset.value === card2.dataset.value) {
+                card1.style.background = '#90EE90';
+                card2.style.background = '#90EE90';
+                matchedPairs++;
+                
+                if (matchedPairs === 4) {
+                    setTimeout(() => {
+                        document.getElementById('homeScreen').classList.remove('active');
+                        document.getElementById('mainScreen').classList.add('active');
+                    }, 1000);
+                }
+            } else {
+                card1.textContent = '❓';
+                card2.textContent = '❓';
+            }
+            openedCards = [];
+        }
+
+        // Valentine Logic
+        let scale = 1;
+        let clickCount = 0;
+
+        function moveButton() {
+            const noBtn = document.getElementById('noBtn');
+            noBtn.style.left = Math.random() * 80 + '%';
+            noBtn.style.top = Math.random() * 80 + '%';
+        }
+
+        function growYes() {
+            clickCount++;
+            scale += 0.2;
+            document.getElementById('yesBtn').style.transform = `scale(${scale})`;
+            
+            const noGif = document.getElementById('noGifContainer');
+            noGif.classList.remove('hidden');
+            setTimeout(() => noGif.classList.add('hidden'), 1000);
+
+            if(clickCount > 3) {
+                document.getElementById('yesBtn').style.fontSize = `${24 + (clickCount * 3)}px`;
+            }
+        }
+
+        function acceptValentine() {
+            document.getElementById('yesBtn').classList.add('hidden');
+            document.getElementById('noBtn').classList.add('hidden');
+            document.getElementById('successMessage').classList.remove('hidden');
+            document.getElementById('yesGifContainer').classList.remove('hidden');
+            
+            // Confetti effect
+            for(let i = 0; i < 100; i++) {
+                createConfetti();
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'absolute';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.top = '-10px';
+            confetti.style.borderRadius = '50%';
+            document.body.appendChild(confetti);
+
+            confetti.animate([
+                { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], {
+                duration: 3000 + Math.random() * 2000,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            });
+
+            setTimeout(() => confetti.remove(), 5000);
+        }
+
+        // Initialize
+        createFloatingHearts();
+        createMemoryGame();
+    </script>
+</body>
+</html>
